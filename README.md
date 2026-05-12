@@ -1,113 +1,165 @@
-# bioinfotools
+# seurassist
 
-The `bioinfotools` package provides essential bioinformatics tools for the analysis and visualization of single-cell RNA sequencing data.
+The `seurassist` package provides helper functions for the analysis and
+visualization of single-cell RNA sequencing data using Seurat.
 
 ## Installation
 
-You can install the `bioinfotools` package from GitHub using the `devtools` package:
-
-``` r
-devtools::install_github("fmbetul/bioinfotools")
+```r
+devtools::install_github("fmbetul/seurassist")
 ```
 
 ## Usage
 
-To use the package, load it into your R session:
-
-``` r
-library(bioinfotools)
+```r
+library(seurassist)
 ```
 
-For more information on available functions and their usage, please refer to the package documentation.
-
+---
 
 ### 1. Generate Scaled Feature Plots
 
-This function generates feature plots for a list of genes in multiple Seurat objects, scaling the plots by the maximum value of each gene across all objects. The generated plots are then saved as PDF files in an output directory.
+Generates feature plots for a list of genes across multiple Seurat objects,
+scaling the colour axis by the maximum expression value of each gene across
+all objects. Saves the result as PDF files.
 
-```R
+```r
 generate_scaled_FPs(seurat_objects, genes, filename, separate = TRUE)
 ```
 
-- `seurat_objects`: A named list of Seurat objects.
-- `genes`: A character vector of gene names for which to generate feature plots.
-- `filename`: The filename (without extension) to use for the output PDF files.
-- `separate`: A boolean indicating whether to save a separate PDF for each Seurat object. Default is `TRUE`.
+| Argument | Description |
+|---|---|
+| `seurat_objects` | A named list of Seurat objects. |
+| `genes` | A character vector of gene names. |
+| `filename` | Output filename (without extension). Defaults to today's date. |
+| `separate` | If `TRUE`, saves a separate PDF per Seurat object. Default is `TRUE`. |
 
+---
 
 ### 2. Generate Feature Plots for Given Genes
 
-This function generates feature plots for each gene provided in the `gene_list` parameter in a Seurat object. It arranges these plots and saves them as a PDF file.
+Generates feature plots for each gene in `gene_list` and saves them as a PDF.
 
-```R
-generate_AllFPs(SeuFile, gene_list)
+```r
+generate_AllFPs(SeuFile, gene_list, assay = "RNA", reduction = "umap")
 ```
 
-- `SeuFile`: A Seurat object that contains the gene expression data.
-- `gene_list`: A list of genes for which the feature plots need to be generated.
+| Argument | Description |
+|---|---|
+| `SeuFile` | A Seurat object. |
+| `gene_list` | A named list of character vectors of gene names. |
+| `assay` | Assay to use. Default is `"RNA"`. |
+| `reduction` | Dimensional reduction to use. Default is `"umap"`. |
 
+---
 
-### 3. Generate Violin Plots for Given Genes Across Different Clusters
+### 3. Generate Violin Plots for Given Genes Across Clusters
 
-This function generates violin plots for each gene provided in the `gene_list` parameter across different clusters in a Seurat object. It arranges these plots and saves them as a PDF file.
+Generates violin plots for each gene in `gene_list` across clusters and saves
+them as a PDF.
 
-```R
-generate_allVlns(SeuFile, gene_list)
+```r
+generate_allVlns(SeuFile, gene_list, assay = "RNA")
 ```
 
-- `SeuFile`: A Seurat object that contains the gene expression data.
-- `gene_list`: A list of genes for which the violin plots need to be generated.
+| Argument | Description |
+|---|---|
+| `SeuFile` | A Seurat object. |
+| `gene_list` | A named list of character vectors of gene names. |
+| `assay` | Assay to use. Default is `"RNA"`. |
 
+---
 
 ### 4. Save QC File
 
-This function saves UMAP plots and quality control (QC) files, with options to include QC plots and heatmaps, to the output folder.
+Saves a UMAP plot and quality control (QC) plots to a PDF. Optionally generates
+a marker gene heatmap and exports CSV files.
 
-```R
-save_qc_file(SeuFile, version = "v1.0.0", qc.plot = TRUE, Heatmap = FALSE, csv = FALSE, pdf.height = 10, pdf.width = 12)
+> **Note:** `csv = TRUE` requires `Heatmap = TRUE`, since marker genes must be
+> computed before they can be exported.
+
+```r
+save_qc_file(SeuFile, version = "v1.0.0", qc.plot = TRUE, Heatmap = FALSE,
+             csv = FALSE, pdf.height = 10, pdf.width = 12)
 ```
 
-- `SeuFile`: A Seurat object that contains the data.
-- `version`: A string that provides the version number for the QC file. Default is "v1.0.0".
-- `qc.plot`: A logical indicating whether to generate QC plots for each cluster. Default is `TRUE`.
-- `Heatmap`: A logical indicating whether to generate a heatmap. Default is `FALSE`.
-- `csv`: A logical indicating whether to write CSV files for the top 10
+| Argument | Description |
+|---|---|
+| `SeuFile` | A Seurat object. |
+| `version` | Version string used in the output filename. Default is `"v1.0.0"`. |
+| `qc.plot` | If `TRUE`, generates per-cluster QC violin plots. Default is `TRUE`. |
+| `Heatmap` | If `TRUE`, generates a top-marker heatmap. Default is `FALSE`. |
+| `csv` | If `TRUE` and `Heatmap = TRUE`, exports marker CSVs. Default is `FALSE`. |
+| `pdf.height` | PDF height in inches. Default is `10`. |
+| `pdf.width` | PDF width in inches. Default is `12`. |
 
- markers and all markers per cluster. Default is `FALSE`.
-- `pdf.height`: A numeric value specifying the height of the PDF. Default is 10.
-- `pdf.width`: A numeric value specifying the width of the PDF. Default is 12.
+---
 
+### 5. Count and Percentage Summary of Metadata
 
-### 5. Plot Cells of a Specified Sample and Cluster Type in Integrated Seurat Object
+Returns a data frame with cell counts and percentages for each unique value in
+a metadata column. Useful for summarising cell type or sample compositions.
 
-This function plots cells of a specified sample and cluster type using a UMAP plot.
-
-```R
-plot_cells_from_sample(sample, ClusterName, integrated)
+```r
+count_percent_by(object, metadata, colname = "CellType", sort = TRUE)
 ```
 
-- `sample`: A Seurat object that contains the sample data.
-- `ClusterName`: A string that specifies the cell type or cluster name to be plotted.
-- `integrated`: An integrated Seurat object that contains the merged data from multiple samples.
+| Argument | Description |
+|---|---|
+| `object` | A Seurat object. |
+| `metadata` | Name of the metadata column to summarise (e.g. `"celltype"`, `"sample"`). |
+| `colname` | Column name for the category in the output data frame. Default is `"CellType"`. |
+| `sort` | If `TRUE`, sorts by count in decreasing order. Default is `TRUE`. |
 
+**Example output:**
 
-### 6. Plot Specific Cells from an Integrated Seurat Object
-
-The `plot_cells_from_integrated` function generates a UMAP plot for specific cells in a given sample that belong to a certain cluster from an integrated Seurat object.
-
-```R
-plot_cells_from_integrated(integrated, ClusterName, sample)
+```
+    CellType Count Percent
+1    T cells  1200    35.2
+2   B cells    850    24.9
+3  Monocytes    600    17.6
+...
 ```
 
-- `integrated`: A Seurat object. This is an integrated or merged Seurat object that includes data from multiple samples.
-- `ClusterName`: A character string specifying the name of the cell type or cluster whose cells are to be visualized.
-- `sample`: A Seurat object that contains scRNA-seq data for a specific sample.
+---
 
+### 6. Plot Cells of a Specified Sample and Cluster on the Integrated UMAP
 
+Highlights cells from a specified cluster in a sample on the UMAP of an
+integrated Seurat object.
+
+```r
+plot_cells_from_sample(sample, ClusterName, integrated, cluster_col = "celltype")
+```
+
+| Argument | Description |
+|---|---|
+| `sample` | A per-sample Seurat object. |
+| `ClusterName` | The cell type or cluster name to highlight. |
+| `integrated` | The integrated Seurat object. |
+| `cluster_col` | Metadata column holding cluster labels. Default is `"celltype"`. |
+
+---
+
+### 7. Plot Specific Cells from an Integrated Object on a Per-Sample UMAP
+
+Highlights cells from a specified cluster (as defined in the integrated object)
+on the UMAP of an individual sample.
+
+```r
+plot_cells_from_integrated(integrated, ClusterName, sample, cluster_col = "celltype")
+```
+
+| Argument | Description |
+|---|---|
+| `integrated` | The integrated Seurat object. |
+| `ClusterName` | The cell type or cluster name to highlight. |
+| `sample` | A per-sample Seurat object. |
+| `cluster_col` | Metadata column holding cluster labels. Default is `"celltype"`. |
+
+---
 
 ## Dependencies
-
-The `bioinfotools` package depends on the following packages:
 
 - Seurat
 - dplyr
@@ -120,12 +172,13 @@ The `bioinfotools` package depends on the following packages:
 
 ## License
 
-The `bioinfotools` package is licensed under the GPL-3 license.
+GPL-3
 
 ## Issues and Contributions
 
-If you encounter any issues with the `bioinfotools` package or would like to contribute to its development, please [open an issue](https://github.com/fmbetul/bioinfotools/issues) on GitHub.
+Please [open an issue](https://github.com/fmbetul/seurassist/issues) on GitHub
+for bugs or feature requests.
 
 ## Contact
 
-For any further inquiries or questions, please feel free to contact the package maintainer, F. M. Betul Erol, at fmab_erol@hotmail.com.
+F. M. Betul Erol — fmab_erol@hotmail.com

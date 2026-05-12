@@ -1,32 +1,42 @@
 #' Plot cells of a specified sample and cluster type
 #'
-#' This function plots cells of a specified sample and cluster type using a UMAP plot.
+#' This function highlights cells from a specified cluster in a given sample
+#' on the UMAP of an integrated Seurat object.
 #'
 #' @param sample A Seurat object that contains the sample data.
-#' @param ClusterName A string that specifies the cell type or cluster name to be plotted.
-#' @param integrated An integrated Seurat object that contains the merged data from multiple samples.
+#' @param ClusterName A string specifying the cell type or cluster name to highlight.
+#' @param integrated An integrated Seurat object containing merged data from multiple samples.
+#' @param cluster_col A string specifying the metadata column that holds cluster or cell type
+#'   labels. Default is "celltype".
 #'
-#' @return The function does not return anything. It prints a UMAP plot to the console.
+#' @return The UMAP \code{ggplot} object, invisibly. Also prints the plot to the console.
 #'
 #' @seealso \code{\link[Seurat]{DimPlot}}
 #'
 #' @importFrom Seurat DimPlot
 #'
 #' @export
-
-
-plot_cells_from_sample <- function(sample, ClusterName, integrated){
+plot_cells_from_sample <- function(sample, ClusterName, integrated, cluster_col = "celltype") {
 
   sample_name <- as.character(substitute(sample))
 
-  # Get the cell barcodes
-  cell.barcodes <- rownames(subset(sample@meta.data, sample@meta.data$celltype == ClusterName))
+  if (!cluster_col %in% colnames(sample[[]])) {
+    stop("Column '", cluster_col, "' not found in sample metadata.")
+  }
 
-  # Add the sample prefix
+  # Get cell barcodes for the specified cluster
+  meta <- sample[[]][, cluster_col, drop = FALSE]
+  cell.barcodes <- rownames(meta[meta[[cluster_col]] == ClusterName, , drop = FALSE])
+
+  if (length(cell.barcodes) == 0) {
+    warning("No cells found for cluster '", ClusterName, "' in sample.")
+  }
+
+  # Add sample prefix to match barcode naming in the integrated object
   cell.barcodes <- paste0(sample_name, "_", cell.barcodes)
 
-  # Visualize the Cluster cells from sample Seurat object
-  print(DimPlot(integrated, group.by = 'celltype', reduction = "umap", label = TRUE, cells.highlight = cell.barcodes))
-
+  p <- DimPlot(integrated, group.by = cluster_col, reduction = "umap",
+               label = TRUE, cells.highlight = cell.barcodes)
+  print(p)
+  invisible(p)
 }
-

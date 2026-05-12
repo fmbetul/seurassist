@@ -2,9 +2,11 @@ exportPattern("^[[:alpha:]]+")
 
 importFrom("grDevices", "dev.off", "pdf")
 importFrom("utils", "write.csv")
-importFrom("Seurat", "DefaultAssay<-", "DimPlot", "FindAllMarkers", "PercentageFeatureSet", "VlnPlot", "DoHeatmap", "FeaturePlot", "FetchData")
-importFrom("dplyr", "%>%", "group_by", "slice_max", "top_n")
-importFrom("ggplot2", "coord_flip", "theme", "element_blank", "element_text", "labs", "scale_color_gradientn", "ggtitle")
+importFrom("Seurat", "DefaultAssay<-", "DimPlot", "DoHeatmap", "FeaturePlot", "FetchData",
+           "FindAllMarkers", "Idents", "PercentageFeatureSet", "VlnPlot")
+importFrom("dplyr", "arrange", "desc", "group_by", "mutate", "rename", "top_n")
+importFrom("ggplot2", "coord_flip", "element_blank", "element_text", "ggtitle", "labs",
+           "scale_color_gradientn", "theme")
 importFrom("ggpubr", "ggarrange")
 importFrom("magrittr", "%>%")
 importFrom("rlang", ".data")

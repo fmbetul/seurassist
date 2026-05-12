@@ -1,11 +1,14 @@
-Package: bioinfotools
+Package: seurassist
 Type: Package
-Title: Bioinformatics Tools
+Title: Seurat Assistant Tools for Single-Cell RNA-seq Analysis
 Version: 1.0.0
 Author: F. M. Betul Erol, Hannah Glover
 Maintainer: F. M. Betul Erol <fmab_erol@hotmail.com>
-Description: This package provides essential bioinformatics tools for the analysis and visualization of single-cell RNA sequencing data.
-Imports: 
+Description: Provides helper functions for the analysis and visualization of
+    single-cell RNA sequencing data using Seurat, including scaled feature plots,
+    violin plots, QC reporting, cell-type composition summaries, and cross-sample
+    cell highlighting on UMAP embeddings.
+Imports:
     Seurat,
     dplyr,
     ggplot2,
