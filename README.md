@@ -181,4 +181,4 @@ for bugs or feature requests.
 
 ## Contact
 
-F. M. Betul Erol — fmab_erol@hotmail.com
+F. M. Betul Erol, MD
