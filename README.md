@@ -79,7 +79,7 @@ A two-tier approach: tier 1 flags whole bad groups (e.g. clusters); tier 2 sets 
 
 ## License
 
-GPL-3
+MIT (see [LICENSE.md](LICENSE.md)).
 
 ## Issues and Contributions
 

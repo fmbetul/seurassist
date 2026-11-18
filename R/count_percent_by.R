@@ -32,7 +32,7 @@
 #'
 #' @importFrom dplyr rename mutate arrange desc
 #' @importFrom magrittr %>%
-#' @importFrom rlang :=
+#' @importFrom rlang := .data
 #'
 #' @export
 count_percent_by <- function(object, metadata, colname = "CellType", sort = TRUE) {
@@ -42,11 +42,11 @@ count_percent_by <- function(object, metadata, colname = "CellType", sort = TRUE
   }
 
   df <- as.data.frame(table(object[[]][[metadata]])) %>%
-    dplyr::rename(!!colname := Var1, Count = Freq) %>%
-    dplyr::mutate(Percent = round(100 * Count / sum(Count), 1))
+    dplyr::rename(!!colname := "Var1", Count = "Freq") %>%
+    dplyr::mutate(Percent = round(100 * .data$Count / sum(.data$Count), 1))
 
   if (sort) {
-    df <- df %>% dplyr::arrange(dplyr::desc(Count))
+    df <- df %>% dplyr::arrange(dplyr::desc(.data$Count))
   }
 
   return(df)

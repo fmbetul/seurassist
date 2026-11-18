@@ -2,8 +2,10 @@ Package: seurassist
 Type: Package
 Title: Seurat Assistant Tools for Single-Cell RNA-seq Analysis
 Version: 1.0.0
-Author: F. M. Betul Erol, Hannah Glover
-Maintainer: F. M. Betul Erol <fmab_erol@hotmail.com>
+Authors@R: c(
+    person("F. M. Betul", "Erol", role = c("aut", "cre"),
+           email = "fmab.erol@gmail.com"),
+    person("Hannah", "Glover", role = "ctb"))
 Description: Provides helper functions for the analysis and visualization of
     single-cell RNA sequencing data using Seurat, including scaled feature plots,
     violin plots, QC reporting, cell-type composition summaries, and cross-sample
@@ -20,7 +22,12 @@ Imports:
     scales,
     stats,
     methods
-License: GPL-3
+Suggests:
+    Matrix,
+    withr,
+    testthat (>= 3.0.0)
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Config/testthat/edition: 3
 Config/roxygen2/version: 8.1.1

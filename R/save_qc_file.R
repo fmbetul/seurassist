@@ -47,7 +47,7 @@ save_qc_file <- function(SeuFile, version = "v1.0.0", qc.plot = TRUE, Heatmap = 
   }
 
   if (Heatmap) {
-    message("Running FindAllMarkers — this may take a while...")
+    message("Running FindAllMarkers - this may take a while...")
     markers <- FindAllMarkers(SeuFile, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
 
     top10 <- markers %>%
