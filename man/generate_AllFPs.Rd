@@ -2,19 +2,23 @@
 % Please edit documentation in R/generate_allFPs.R
 \name{generate_AllFPs}
 \alias{generate_AllFPs}
-\title{Generate Feature Plots for given genes across different clusters}
+\title{Generate Feature Plots for given genes}
 \usage{
-generate_AllFPs(SeuFile, gene_list)
+generate_AllFPs(SeuFile, gene_list, assay = "RNA", reduction = "umap")
 }
 \arguments{
 \item{SeuFile}{A Seurat object that contains the gene expression data.}
 
-\item{gene_list}{A list of genes for which the feature plots need to be generated.}
+\item{gene_list}{A named list of character vectors of gene names.}
+
+\item{assay}{The assay to use. Default is "RNA".}
+
+\item{reduction}{The dimensional reduction to use for plotting. Default is "umap".}
 }
 \value{
-Generates a PDF file containing the feature plots for the provided genes.
+Saves a PDF file to the output directory. Returns invisibly.
 }
 \description{
-This function generates feature plots for each gene provided in the gene_list parameter across
-different clusters in a Seurat object. It arranges these plots and saves them as a PDF file.
+This function generates feature plots for each gene provided in \code{gene_list}
+in a Seurat object, arranges them, and saves the result as a PDF file.
 }

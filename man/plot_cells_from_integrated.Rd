@@ -4,25 +4,32 @@
 \alias{plot_cells_from_integrated}
 \title{Plot specific cells from an integrated Seurat object}
 \usage{
-plot_cells_from_integrated(integrated, ClusterName, sample)
+plot_cells_from_integrated(
+  integrated,
+  ClusterName,
+  sample,
+  cluster_col = "celltype"
+)
 }
 \arguments{
-\item{integrated}{A Seurat object. This is an integrated or merged Seurat object
-that includes data from multiple samples.}
+\item{integrated}{A Seurat object. An integrated or merged object that includes
+data from multiple samples.}
 
 \item{ClusterName}{A character string specifying the name of the cell type or
-cluster whose cells are to be visualized.}
+cluster whose cells are to be visualised.}
 
-\item{sample}{A Seurat object that contains scRNA-seq data for a specific
-sample.}
+\item{sample}{A Seurat object containing scRNA-seq data for a specific sample.}
+
+\item{cluster_col}{A string specifying the metadata column that holds cluster or cell type
+labels. Default is "celltype".}
 }
 \value{
-This function does not return a value, but produces a UMAP plot for
-        the selected cells from the integrated Seurat object.
+The UMAP \code{ggplot} object, invisibly. Also prints the plot to the console.
 }
 \description{
-This function generates a UMAP plot for specific cells in a given sample that
-belong to a certain cluster from an integrated Seurat object.
+This function highlights cells from a specified cluster and sample on the
+UMAP of a per-sample Seurat object, using barcode information from an
+integrated object.
 }
 \seealso{
 \code{\link[Seurat]{DimPlot}}

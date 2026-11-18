@@ -16,8 +16,11 @@ Imports:
     magrittr,
     grDevices,
     utils,
-    rlang
+    rlang,
+    scales,
+    stats,
+    methods
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.3
+Config/roxygen2/version: 8.1.1

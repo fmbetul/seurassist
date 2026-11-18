@@ -8,7 +8,7 @@ generate_scaled_FPs(
   seurat_objects,
   genes,
   filename = as.character(Sys.Date()),
-  separate = F
+  separate = TRUE
 )
 }
 \arguments{
@@ -16,16 +16,17 @@ generate_scaled_FPs(
 
 \item{genes}{A character vector of gene names for which to generate feature plots.}
 
-\item{filename}{The filename (without extension) to use for the output PDF files.}
+\item{filename}{The filename (without extension) to use for the output PDF files.
+Defaults to today's date.}
 
-\item{separate}{A boolean indicating whether to save a separate PDF for each Seurat object.
-Default is TRUE.}
+\item{separate}{Logical, whether to save a separate PDF for each Seurat object.
+If FALSE, all objects are combined into a single PDF. Default is TRUE.}
 }
 \value{
 This function does not return a value. It generates PDF files with feature plots.
 }
 \description{
 This function generates feature plots for a list of genes in multiple Seurat objects,
-scaling the plots by the maximum value of each gene across all objects.
-The generated plots are then saved as PDF files in an output directory.
+scaling the colour axis by the maximum expression value of each gene across all objects.
+The generated plots are saved as PDF files in the working directory.
 }

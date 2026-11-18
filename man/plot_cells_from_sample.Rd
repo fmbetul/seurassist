@@ -4,20 +4,29 @@
 \alias{plot_cells_from_sample}
 \title{Plot cells of a specified sample and cluster type}
 \usage{
-plot_cells_from_sample(sample, ClusterName, integrated)
+plot_cells_from_sample(
+  sample,
+  ClusterName,
+  integrated,
+  cluster_col = "celltype"
+)
 }
 \arguments{
 \item{sample}{A Seurat object that contains the sample data.}
 
-\item{ClusterName}{A string that specifies the cell type or cluster name to be plotted.}
+\item{ClusterName}{A string specifying the cell type or cluster name to highlight.}
 
-\item{integrated}{An integrated Seurat object that contains the merged data from multiple samples.}
+\item{integrated}{An integrated Seurat object containing merged data from multiple samples.}
+
+\item{cluster_col}{A string specifying the metadata column that holds cluster or cell type
+labels. Default is "celltype".}
 }
 \value{
-The function does not return anything. It prints a UMAP plot to the console.
+The UMAP \code{ggplot} object, invisibly. Also prints the plot to the console.
 }
 \description{
-This function plots cells of a specified sample and cluster type using a UMAP plot.
+This function highlights cells from a specified cluster in a given sample
+on the UMAP of an integrated Seurat object.
 }
 \seealso{
 \code{\link[Seurat]{DimPlot}}
