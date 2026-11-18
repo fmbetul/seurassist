@@ -1,7 +1,7 @@
 Package: seurassist
 Type: Package
 Title: Seurat Assistant Tools for Single-Cell RNA-seq Analysis
-Version: 1.0.0
+Version: 0.2.0
 Authors@R: c(
     person("F. M. Betul", "Erol", role = c("aut", "cre"),
            email = "fmab.erol@gmail.com"),

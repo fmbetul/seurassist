@@ -1,4 +1,4 @@
-# seurassist 1.0.0
+# seurassist 0.2.0
 
 First release under the name `seurassist` (formerly `bioinfotools`).
 
