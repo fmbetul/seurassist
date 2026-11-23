@@ -1,3 +1,14 @@
+# seurassist (development version)
+
+## New
+* `export_qc_sample()` writes a lightweight per-sample QC file (a few per-cell
+  columns, the verdict, summary and optional threshold/flag tables) instead of
+  a Seurat object.
+* `build_qc_report()` combines the exported samples into summary, removal
+  breakdown, threshold and flag CSVs and one self-contained `qc_report.html`.
+  Adding or re-thresholding a sample only needs a re-export and a rebuild.
+* `rmarkdown` and `knitr` added to `Suggests` (needed to render the report).
+
 # seurassist 0.2.0
 
 First release under the name `seurassist` (formerly `bioinfotools`).

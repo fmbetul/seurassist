@@ -61,6 +61,25 @@ A two-tier approach: tier 1 flags whole bad groups (e.g. clusters); tier 2 sets 
 | `qc_metric_label(m)` | Display label for a QC metric. |
 | `theme_qc(base_size)` | Compact ggplot2 theme for QC plots. |
 
+### QC reports across samples
+
+Run `export_qc_sample()` once per sample (e.g. on a server), then
+`build_qc_report()` to compare all samples. Only a few per-cell QC columns are
+stored (a few KB per sample), never the Seurat object, so only the `report/`
+folder (one HTML file and a few CSVs) needs downloading. To add or re-threshold
+a sample, re-export it and rebuild.
+
+| Function | Description |
+|---|---|
+| `export_qc_sample(x, sample, qc_dir, metrics, cluster_col, thresholds, group_flags, ...)` | Writes a lightweight per-sample `.rds` (cell metrics, verdict, summary, thresholds) to `qc_dir/cells/`. Export before removing failing cells. |
+| `build_qc_report(qc_dir, output_dir, samples, ...)` | Writes combined summary, removal-breakdown, threshold and group-flag CSVs plus a self-contained `qc_report.html` to `qc_dir/report/`. |
+
+```r
+export_qc_sample(meta, "S1", "qc", cluster_col = "seurat_clusters",
+                 thresholds = thr, group_flags = flags)
+build_qc_report("qc")
+```
+
 ---
 
 ## Dependencies
@@ -76,6 +95,11 @@ A two-tier approach: tier 1 flags whole bad groups (e.g. clusters); tier 2 sets 
 - stats
 - methods
 - rlang
+
+Suggested (needed only to render the HTML report in `build_qc_report()`, together with pandoc):
+
+- rmarkdown
+- knitr
 
 ## License
 
