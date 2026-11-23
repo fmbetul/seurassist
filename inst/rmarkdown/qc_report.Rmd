@@ -1,0 +1,168 @@
+---
+title: "`r params$title`"
+date: "`r format(Sys.Date())`"
+output:
+  html_document:
+    self_contained: true
+    toc: true
+    toc_float: true
+    theme: default
+params:
+  qc: NULL
+  title: "Per-sample QC report"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE,
+                      fig.width = 9, dev = "png", dpi = 110)
+library(ggplot2)
+qc      <- params$qc
+cells   <- qc$cells
+summ    <- qc$summary
+metrics <- qc$metrics
+samples <- qc$samples
+cells$sample <- factor(cells$sample, levels = samples)
+has_qc  <- any(!is.na(cells$qc_pass))
+has_cl  <- any(!is.na(cells$cluster))
+plot_m  <- ifelse(metrics %in% seurassist::QC_LOG10_METRICS,
+                  paste0(metrics, "_log2"), metrics)
+n_s     <- length(samples)
+```
+
+`r n_s` sample(s): `r paste(samples, collapse = ", ")`.
+`r if (!has_qc) "**No pass/fail information was exported: all plots show pre-QC data.**"`
+
+# Summary
+
+```{r summary-table}
+cols <- c("sample", "n_cells", "n_pass", "n_fail", "pct_fail", "n_doublet",
+          "pct_doublet")
+knitr::kable(summ[, cols], row.names = FALSE,
+             caption = "Cells per sample and cells failing QC.")
+med <- summ[, c("sample", grep("^median_", colnames(summ), value = TRUE))]
+knitr::kable(med, row.names = FALSE, digits = 2,
+             caption = "Median of each metric (`_pass`: after QC).")
+```
+
+```{r pct-fail, fig.height = 3.5}
+if (has_qc) {
+  ggplot(transform(summ, sample = factor(sample, levels = samples)),
+         aes(x = sample, y = pct_fail)) +
+    geom_col(fill = "#c62828") +
+    labs(x = NULL, y = "% cells failing QC", title = "Cells removed per sample") +
+    seurassist::theme_qc() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+}
+```
+
+# Why cells were removed
+
+```{r reasons, fig.height = 4.5}
+bd <- qc$breakdown
+if (!is.null(bd)) {
+  fails <- bd[bd$reason != "pass", ]
+  top   <- names(sort(tapply(fails$n_cells, fails$reason, sum), decreasing = TRUE))
+  top   <- utils::head(top, 8)
+  bd$reason <- ifelse(bd$reason %in% c("pass", top), bd$reason, "other")
+  bd <- aggregate(pct_of_sample ~ sample + reason, bd, sum)
+  bd$sample <- factor(bd$sample, levels = samples)
+  bd <- bd[bd$reason != "pass", ]
+  if (nrow(bd)) {
+    ggplot(bd, aes(x = sample, y = pct_of_sample, fill = reason)) +
+      geom_col() +
+      labs(x = NULL, y = "% of sample's cells", fill = "reason") +
+      seurassist::theme_qc() +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  } else cat("No cells failed QC.")
+}
+```
+
+Full table: `qc_removal_breakdown.csv`.
+
+# Metric distributions across samples
+
+```{r violins-before, fig.height = 2.2 * length(metrics) + 1}
+seurassist::qc_violin_stack(cells, "sample", plot_m,
+                            title = "All cells (before QC)", x_angle = 45)
+```
+
+```{r violins-after, fig.height = 2.2 * length(metrics) + 1}
+if (has_qc)
+  seurassist::qc_violin_stack(cells[cells$qc_pass %in% TRUE, ], "sample", plot_m,
+                              title = "Cells passing QC", x_angle = 45)
+```
+
+# Counts versus genes
+
+```{r scatter, fig.height = 2.6 * ceiling(n_s / 3) + 1}
+sx <- metrics[1]
+sy <- if (length(metrics) > 1) metrics[2] else NULL
+if (!is.null(sy)) {
+  thin <- function(d) {
+    k <- qc$max_cells_plot
+    if (nrow(d) <= k) d else d[unique(round(seq(1, nrow(d), length.out = k))), ]
+  }
+  d <- do.call(rbind, lapply(split(cells, cells$sample), thin))
+  d$status <- if (has_qc) ifelse(d$qc_pass %in% TRUE, "pass", "fail") else "all"
+  p <- ggplot(d, aes(x = .data[[sx]], y = .data[[sy]], colour = status)) +
+    geom_point(size = 0.3, alpha = 0.4) +
+    facet_wrap(~ sample, ncol = 3) +
+    scale_colour_manual(values = c(pass = "grey60", fail = "#d32f2f",
+                                   all = "grey40")) +
+    labs(x = seurassist::qc_metric_label(sx), y = seurassist::qc_metric_label(sy),
+         colour = NULL) +
+    guides(colour = guide_legend(override.aes = list(size = 2, alpha = 1))) +
+    seurassist::theme_qc()
+  if (sx %in% seurassist::QC_LOG10_METRICS) p <- p + scale_x_log10()
+  if (sy %in% seurassist::QC_LOG10_METRICS) p <- p + scale_y_log10()
+  p
+}
+```
+
+# Thresholds used
+
+```{r thresholds}
+thr <- qc$thresholds
+if (is.null(thr)) {
+  cat("No threshold tables were exported.")
+} else {
+  keep <- intersect(c("sample", "group", "metric", "min_thr", "max_thr",
+                      "n_cells", "method"), colnames(thr))
+  knitr::kable(thr[, keep], row.names = FALSE, digits = 2)
+}
+```
+
+```{r flags}
+fl <- qc$flags
+if (!is.null(fl)) {
+  knitr::kable(fl[fl$status != "pass", ], row.names = FALSE, digits = 2,
+               caption = "Clusters flagged by tier-1 (non-pass only).")
+}
+```
+
+# Per-sample details
+
+```{r per-sample, results = "asis", fig.height = 3.2 * ceiling(length(metrics) / 2)}
+for (s in samples) {
+  cat("\n\n## ", s, "\n\n")
+  d <- cells[cells$sample == s, ]
+  if (!any(!is.na(d$cluster))) {
+    cat("No cluster column was exported for this sample.\n\n")
+    next
+  }
+  t_s <- if (is.null(qc$thresholds)) NULL else
+    qc$thresholds[qc$thresholds$sample == s, , drop = FALSE]
+  f_s <- if (is.null(qc$flags)) NULL else
+    qc$flags[qc$flags$sample == s, , drop = FALSE]
+  if (!is.null(t_s) && !nrow(t_s)) t_s <- NULL
+  if (!is.null(f_s) && !nrow(f_s)) f_s <- NULL
+  panels <- lapply(metrics, function(m)
+    seurassist::qc_violin_panel(d, "cluster", m, t_s, f_s,
+                                show_legend = FALSE))
+  print(ggpubr::ggarrange(plotlist = panels, ncol = min(2, length(panels)),
+                          nrow = ceiling(length(panels) / 2)))
+  cat("\n\n")
+}
+```
+
+*Session: seurassist `r as.character(utils::packageVersion("seurassist"))`, R `r getRversion()`.*

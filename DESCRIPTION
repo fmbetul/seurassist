@@ -24,6 +24,8 @@ Imports:
     methods
 Suggests:
     Matrix,
+    knitr,
+    rmarkdown,
     withr,
     testthat (>= 3.0.0)
 License: MIT + file LICENSE
